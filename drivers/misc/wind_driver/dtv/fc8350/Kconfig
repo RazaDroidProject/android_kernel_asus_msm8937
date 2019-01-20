@@ -1,0 +1,8 @@
+## /* add by lihaiyan start  */
+config DTV_FC8350_SUPPORT
+    tristate "LeadCore Finger Print Driver"
+	default n
+    help
+        LeadCore Finger Print Supported
+## /* add by lihaiyan end  */
+
