@@ -1,0 +1,7 @@
+# add by zhaozhensen@wind-mobi.com 20170110 begin
+config WIND_ASUS_SIM_DEFAULT_CONFIG
+  bool "CONFIG_WIND_ASUS_SIM_DEFAULT_CONFIG"
+  default n
+  help
+    CONFIG_WIND_ASUS_SIM_DEFAULT_CONFIG
+# add by zhaozhensen@wind-mobi.com 20170110 end
