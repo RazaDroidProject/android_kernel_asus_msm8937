@@ -1,0 +1,7 @@
+#liulinsheng@wind-mobi.com 20171023 begin
+config WIND_ASUS_USB_TEMP_CHECK
+  bool "CONFIG_WIND_ASUS_USB_TEMP_CHECK"
+  default n
+  help
+    CONFIG_WIND_ASUS_USB_TEMP_CHECK
+#liulinsheng@wind-mobi.com 20171023 end
