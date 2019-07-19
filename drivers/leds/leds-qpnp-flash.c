@@ -2516,8 +2516,10 @@ static int qpnp_flash_led_probe(struct spmi_device *spmi)
 	struct qpnp_flash_led *led;
 	struct resource *flash_resource;
 	struct device_node *node, *temp;
+#ifdef CONFIG_DEBUG_FS
 	struct dentry *root, *file;
-	int rc, i = 0, j, num_leds = 0;
+#endif
+	int rc, i = 0, j = 0, num_leds = 0;
 	u32 val;
 
 	node = spmi->dev.of_node;
@@ -2683,6 +2685,7 @@ static int qpnp_flash_led_probe(struct spmi_device *spmi)
 
 	led->num_leds = i;
 
+#ifdef CONFIG_DEBUG_FS
 	root = debugfs_create_dir("flashLED", NULL);
 	if (IS_ERR_OR_NULL(root)) {
 		pr_err("Error creating top level directory err%ld",
@@ -2713,16 +2716,19 @@ static int qpnp_flash_led_probe(struct spmi_device *spmi)
 		pr_err("error creating 'strobe' entry\n");
 		goto error_led_debugfs;
 	}
+#endif
 
 	dev_set_drvdata(&spmi->dev, led);
 
 	return 0;
 
+#ifdef CONFIG_DEBUG_FS
 error_led_debugfs:
 	debugfs_remove_recursive(root);
 error_free_led_sysfs:
 	i = led->num_leds - 1;
 	j = ARRAY_SIZE(qpnp_flash_led_attrs) - 1;
+#endif
 error_led_register:
 	for (; i >= 0; i--) {
 		for (; j >= 0; j--)
