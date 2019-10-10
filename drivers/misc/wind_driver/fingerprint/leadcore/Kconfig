@@ -1,0 +1,8 @@
+## /* add by leadcore start  */
+config LEADCORE_FINGERPRINT
+    tristate "LeadCore Finger Print Driver"
+	default n
+    help
+        LeadCore Finger Print Supported
+## /* add by leadcore end  */
+

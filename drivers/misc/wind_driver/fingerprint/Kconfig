@@ -1,0 +1,6 @@
+
+## /* add by lihaiyan start  */
+source "drivers/misc/fingerprint/leadcore/Kconfig"
+source "drivers/misc/fingerprint/microarray/Kconfig"
+source "drivers/misc/fingerprint/sunwave/Kconfig"
+## /* add by lihaiyan end  */

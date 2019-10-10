@@ -1,0 +1,19 @@
+
+## lihaiyan@wind-mobi.com 20171101 +++
+
+
+config WIND_DEVICE_INFO
+	bool "CONFIG_WIND_DEVICE_INFO"
+	default y
+	help
+		Select y or n
+
+#source "drivers/misc/wind_driver/fingerprint/Kconfig"
+source "drivers/misc/wind_driver/fingerprint/leadcore/Kconfig"
+source "drivers/misc/wind_driver/fingerprint/microarray/Kconfig"
+source "drivers/misc/wind_driver/fingerprint/sunwave/Kconfig"
+source "drivers/misc/wind_driver/dtv/fc8350/Kconfig"		
+
+
+## lihaiyan@wind-mobi.com 20171101 ---
+

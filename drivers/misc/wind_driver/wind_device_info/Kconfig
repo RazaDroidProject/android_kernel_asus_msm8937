@@ -1,0 +1,7 @@
+#lihaiyan@wind-mobi.com 20171101 begin
+config WIND_DEVICE_INFO
+	bool "CONFIG_WIND_DEVICE_INFO"
+	default y
+	help
+		Select y or n
+#lihaiyan@wind-mobi.com 20171101 end
