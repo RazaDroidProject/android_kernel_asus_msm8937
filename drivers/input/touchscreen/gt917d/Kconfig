@@ -1,0 +1,13 @@
+#hebiao@wind-mobi.com 20170824 begin
+#
+# GT Touchscreen driver configuration
+#
+config TOUCHSCREEN_GT917D
+        bool "GT Touchscreen"
+		depends on I2C
+		default n
+		help
+		  Say Y here if you have Focaltech touch panel.
+		  If unsure, say N.
+#hebiao@wind-mobi.com 20170824 end  
+  
