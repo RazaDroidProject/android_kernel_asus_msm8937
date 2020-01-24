@@ -25,7 +25,188 @@
 #include "bus.h"
 #include "mmc_ops.h"
 #include "sd_ops.h"
+//lihaiyan@wind-mobi.com emmc health +++
+//adb shell cat  /proc/emmc_health/state  
+#include <linux/fs.h>
+#include <linux/proc_fs.h>
+#include <linux/device.h>
+#include <asm/uaccess.h>
+#include <linux/kallsyms.h>
+#include "../../../../arch/powerpc/boot/stdlib.h"
 
+#define emmc_health_proc_dir "emmc_health"
+#define emmc_state_proc_dir "state"
+
+
+static struct proc_dir_entry *emmc_proc_dir = NULL;
+static struct proc_dir_entry *proc_data_file1 = NULL;
+
+#define emmc_version_proc_dir "version"
+static struct proc_dir_entry *proc_version_file1 = NULL;
+int emmc_version_value=0;
+
+int emmc_health_value=0;
+
+static ssize_t emmc_health_write(struct file *file, const char __user *buf, size_t len, loff_t *pos)
+{
+/*
+	size_t size = 0;
+    int data_read_enable = 0;	 
+  	sscanf(buf, "%d", &data_read_enable);
+	x = data_read_enable;
+	size = sizeof(buf);
+*/
+
+/*
+	int ret = 0;
+	
+	char buff_tmp[10];
+	ret = copy_from_user(buff_tmp, buf, len);
+	printk("emmc get : %s\n",buff_tmp);
+	
+	return ret;
+*/
+
+	return len;		
+}
+static ssize_t emmc_health_read(struct file *file, char __user *buf, size_t len, loff_t *pos)
+{
+	int ret = 0;
+	char emmc_health_level[5]="0x00";
+	
+	printk("emmc_health_value=%d,*pos=%d,len=%d\n",emmc_health_value,(int)(*pos),(int)len);
+	
+	if(*pos)
+		return 0;
+	
+	switch(emmc_health_value){
+		case 0: 
+		case 1:
+		case 2:
+		case 3:
+			ret = sprintf(emmc_health_level, "0x0%x\n", emmc_health_value);
+			break;
+		default:
+			ret = sprintf(emmc_health_level, "0x04\n");
+			break;
+	}
+	printk("emmc_health_level=%s\n",emmc_health_level);
+	
+	ret = copy_to_user( buf, emmc_health_level, sizeof(emmc_health_level));
+	len = sizeof(emmc_health_level);
+	
+	*pos += len;
+	printk("emmc len=%d, *pos=%d \n",(int)len, (int)*pos);
+	
+	return len;
+
+/*
+	int ret = 0;
+	
+	char buff_tmp[2];
+	printk("emmc_health_value=%d,*pos=%d,len=%d\n",emmc_health_value,(int)(*pos),(int)len);
+	
+	if(*pos)
+		return 0;
+	
+	ret = sprintf(buff_tmp, "%d\n", emmc_health_value);
+	
+	ret = copy_to_user( buf, buff_tmp, sizeof(buff_tmp));
+	len = sizeof(buff_tmp);
+	
+	*pos += len;
+	printk("emmc len=%d, *pos=%d \n",(int)len, (int)*pos);
+	
+	return len;
+*/
+/*	
+	char *ptr = buf;
+    printk("emmc_health_value=%d,*pos=%d,len=%d\n",emmc_health_value,(int)(*pos),(int)len);
+	
+	if (*pos)
+		return 0;
+	
+    ptr += sprintf(ptr, "%d\n", emmc_health_value);
+
+    *pos += ptr - buf;
+
+	return (ptr -buf);
+*/
+}
+
+static struct file_operations proc_data_file1_ops =
+{
+	.owner = THIS_MODULE,
+	.write = emmc_health_write,
+	.read = emmc_health_read,
+};
+
+static ssize_t emmc_version_read(struct file *file, char __user *buf, size_t len, loff_t *pos)
+{
+
+	int ret = 0;
+	
+	char buff_tmp[5];
+	printk("emmc_version_value=%d,*pos=%d,len=%d\n",emmc_version_value,(int)(*pos),(int)len);
+	
+	if(*pos)
+		return 0;
+	
+	ret = sprintf(buff_tmp, "0x%x\n", emmc_version_value);
+	
+	ret = copy_to_user( buf, buff_tmp, sizeof(buff_tmp));
+	len = sizeof(buff_tmp);
+	
+	*pos += len;
+	
+	return len;
+}
+
+static struct file_operations proc_version_file1_ops =
+{
+	.owner = THIS_MODULE,
+	.read = emmc_version_read,
+};
+
+
+static int emmc_health_proc_init(void)
+{
+	emmc_proc_dir = proc_mkdir(emmc_health_proc_dir, NULL);
+	if (emmc_proc_dir == NULL)
+	{
+		printk("[emmc_health] %s: emmc_proc_dir file create failed!\n", __func__);
+		return -ENOMEM;
+	}
+
+	proc_data_file1 = proc_create(emmc_state_proc_dir, (S_IWUSR|S_IRUGO|S_IWUGO), 
+		emmc_proc_dir, &proc_data_file1_ops);
+	if(proc_data_file1 == NULL)
+	{
+		printk("[emmc_health] %s: proc data file1 create failed!\n", __func__);
+		remove_proc_entry( emmc_state_proc_dir, emmc_proc_dir );
+		return -ENOMEM;
+	}
+	
+	proc_version_file1 = proc_create(emmc_version_proc_dir, (S_IWUSR|S_IRUGO|S_IWUGO), 
+		emmc_proc_dir, &proc_version_file1_ops);
+	if(proc_version_file1 == NULL)
+	{
+		printk("[emmc_health] %s: proc version file1 create failed!\n", __func__);
+		remove_proc_entry( emmc_version_proc_dir, emmc_proc_dir );
+		return -ENOMEM;
+	}
+	
+	return 0 ;
+}
+
+static int emmc_health_proc_remove(void)
+{
+    //remove_proc_entry( emmc_health_proc_dir, emmc_proc_dir );
+	remove_proc_entry( emmc_state_proc_dir, emmc_proc_dir );
+	remove_proc_entry( emmc_version_proc_dir, emmc_proc_dir );
+	return 0;
+}
+//lihaiyan@wind-mobi.com emmc health ---
 static const unsigned int tran_exp[] = {
 	10000,		100000,		1000000,	10000000,
 	0,		0,		0,		0
@@ -421,6 +602,12 @@ static int mmc_read_ext_csd(struct mmc_card *card, u8 *ext_csd)
 
 	/* Version is coded in the CSD_STRUCTURE byte in the EXT_CSD register */
 	card->ext_csd.raw_ext_csd_structure = ext_csd[EXT_CSD_STRUCTURE];
+	//lihaiyan@wind-mobi.com emmc health +++
+	emmc_health_value= ext_csd[EXT_CSD_STRUCTURE+73];
+	emmc_version_value=ext_csd[254];
+    emmc_health_proc_init();
+	printk("[emmc_health] emmc ext_csd[EXT_CSD_STRUCTURE+73] = %d  emmc_version_value[254] =0x%x\n",ext_csd[EXT_CSD_STRUCTURE+73], emmc_version_value); 
+	//lihaiyan@wind-mobi.com emmc health ---
 	if (card->csd.structure == 3) {
 		if (card->ext_csd.raw_ext_csd_structure > 2) {
 			pr_err("%s: unrecognised EXT_CSD structure "
@@ -2278,6 +2465,9 @@ static void mmc_remove(struct mmc_host *host)
 	unregister_reboot_notifier(&host->card->reboot_notify);
 
 	mmc_exit_clk_scaling(host);
+	//lihaiyan@wind-mobi.com emmc health +++
+	emmc_health_proc_remove();
+	//lihaiyan@wind-mobi.com emmc health ---
 	mmc_remove_card(host->card);
 
 	mmc_claim_host(host);

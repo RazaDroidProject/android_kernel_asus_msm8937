@@ -3002,13 +3002,13 @@ static void _mmc_detect_change(struct mmc_host *host, unsigned long delay,
 		pm_wakeup_event(mmc_dev(host), 5000);
 
 	host->detect_change = 1;
-	/*
-	 * Change in cd_gpio state, so make sure detection part is
-	 * not overided because of manual resume.
-	 */
-	if (cd_irq && mmc_bus_manual_resume(host))
-		host->ignore_bus_resume_flags = true;
 
+/*
+ * Change in cd_gpio state, so make sure detection part is
+ * not overided because of manual resume.
+ */
+	if (cd_irq && mmc_bus_manual_resume(host))	
+		host->ignore_bus_resume_flags = true;	
 	mmc_schedule_delayed_work(&host->detect, delay);
 }
 
