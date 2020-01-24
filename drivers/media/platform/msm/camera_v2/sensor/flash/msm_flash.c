@@ -84,30 +84,34 @@ void msm_torch_brightness_set(struct led_classdev *led_cdev,
 
 	led_trigger_event(torch_trigger, value);
 };
+//zhenglihong@wind-mobi.com 20171025 begin
 
 static struct led_classdev msm_torch_led[MAX_LED_TRIGGERS] = {
 	{
-		.name		= "torch-light0",
+		.name		= "torch0_trigger",
 		.brightness_set	= msm_torch_brightness_set,
 		.brightness	= LED_OFF,
 	},
 	{
-		.name		= "torch-light1",
+		.name		= "torch1_trigger",
 		.brightness_set	= msm_torch_brightness_set,
 		.brightness	= LED_OFF,
 	},
 	{
-		.name		= "torch-light2",
+		.name		= "torch2_trigger",
 		.brightness_set	= msm_torch_brightness_set,
 		.brightness	= LED_OFF,
 	},
 };
+//zhenglihong@wind-mobi.com 20171025 end
 
 static int32_t msm_torch_create_classdev(struct platform_device *pdev,
 				void *data)
 {
 	int32_t rc = 0;
-	int32_t i = 0;
+	//zhenglihong@wind-mobi.com 20171025 begin
+	int32_t i = 0,j = 0;
+	//zhenglihong@wind-mobi.com 20171025 end
 	struct msm_flash_ctrl_t *fctrl =
 		(struct msm_flash_ctrl_t *)data;
 
@@ -115,27 +119,38 @@ static int32_t msm_torch_create_classdev(struct platform_device *pdev,
 		pr_err("Invalid fctrl\n");
 		return -EINVAL;
 	}
+	//zhenglihong@wind-mobi.com 20171025 begin
 
 	for (i = 0; i < fctrl->torch_num_sources; i++) {
 		if (fctrl->torch_trigger[i]) {
 			torch_trigger = fctrl->torch_trigger[i];
+			for (j = 0; j < MAX_LED_TRIGGERS; j++) {
+                                  if (strcmp(fctrl->torch_trigger[i]->name,msm_torch_led[j].name) == 0){
+			
+                                            break;
+                                   }
+						  
+                               }
 			CDBG("%s:%d msm_torch_brightness_set for torch %d",
-				__func__, __LINE__, i);
-			msm_torch_brightness_set(&msm_torch_led[i],
+				__func__, __LINE__, j);
+			msm_torch_brightness_set(&msm_torch_led[j],
 				LED_OFF);
-
+			
+                             CDBG("%s:%d led_classdev_register  %d",
+				__func__, __LINE__, j);
 			rc = led_classdev_register(&pdev->dev,
-				&msm_torch_led[i]);
+				&msm_torch_led[j]);
 			if (rc) {
 				pr_err("Failed to register %d led dev. rc = %d\n",
-						i, rc);
+						j, rc);
 				return rc;
 			}
 		} else {
-			pr_err("Invalid fctrl->torch_trigger[%d]\n", i);
+			pr_err("Invalid fctrl->torch_trigger[%d]\n", j);
 			return -EINVAL;
 		}
 	}
+	//zhenglihong@wind-mobi.com 20171025 end
 
 	return 0;
 };

@@ -20,7 +20,9 @@
 
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
-
+//zhenglihong@wind-mobi.com 20171122 begin
+extern char  g_invokeSensorNameStr[3][32];
+//zhenglihong@wind-mobi.com 20171122 end
 static struct msm_camera_i2c_fn_t msm_sensor_cci_func_tbl;
 static struct msm_camera_i2c_fn_t msm_sensor_secure_func_tbl;
 
@@ -241,6 +243,9 @@ int msm_sensor_match_id(struct msm_sensor_ctrl_t *s_ctrl)
 {
 	int rc = 0;
 	uint16_t chipid = 0;
+//zhenglihong@wind-mobi.com 20171122 begin
+	int32_t sensorid = 0;
+//zhenglihong@wind-mobi.com 20171122 end	
 	struct msm_camera_i2c_client *sensor_i2c_client;
 	struct msm_camera_slave_info *slave_info;
 	const char *sensor_name;
@@ -276,6 +281,24 @@ int msm_sensor_match_id(struct msm_sensor_ctrl_t *s_ctrl)
 				__func__, chipid, slave_info->sensor_id);
 		return -ENODEV;
 	}
+//zhenglihong@wind-mobi.com 20171122 begin
+             sensorid = s_ctrl->sensordata->sensor_info->subdev_id[0];
+	       
+	    if ((sensorid  > 0 ) && (sensorid < 4)) {
+			
+		 if ((0 == strcmp(s_ctrl->sensordata->sensor_name,"s5k3l8_lcetron"))||(0 == strcmp(s_ctrl->sensordata->sensor_name,"ov13855_lcetron")) ) {
+                               sensorid = 0;     
+		 } else if ((0 == strcmp(s_ctrl->sensordata->sensor_name,"hi846_aux"))  || (0 == strcmp(s_ctrl->sensordata->sensor_name,"ov8856_aux"))){
+                                sensorid = 1;     
+		  } else if ((0 == strcmp(s_ctrl->sensordata->sensor_name,"hi846"))  || (0 == strcmp(s_ctrl->sensordata->sensor_name,"ov8856"))|| (0 == strcmp(s_ctrl->sensordata->sensor_name,"ov13858")) || (0 == strcmp(s_ctrl->sensordata->sensor_name,"hi1332_lcetron")) || (0 == strcmp(s_ctrl->sensordata->sensor_name,"hi556")) || (0 == strcmp(s_ctrl->sensordata->sensor_name,"s5k5e8"))) {
+                                sensorid = 2 ;     
+		  }  else {
+                               pr_err("camera fail id\n");
+		  }
+		   pr_debug("sensor_name: %s ,ctrl_id  %d", s_ctrl->sensordata->sensor_name,sensorid);
+                     memcpy((char*)g_invokeSensorNameStr[sensorid],s_ctrl->sensordata->sensor_name,strlen(s_ctrl->sensordata->sensor_name)+1);
+	    }
+//zhenglihong@wind-mobi.com 20171122 end
 	return rc;
 }
 
@@ -1392,11 +1415,15 @@ DONE:
 int msm_sensor_check_id(struct msm_sensor_ctrl_t *s_ctrl)
 {
 	int rc;
+	
 
-	if (s_ctrl->func_tbl->sensor_match_id)
+	if (s_ctrl->func_tbl->sensor_match_id) {
 		rc = s_ctrl->func_tbl->sensor_match_id(s_ctrl);
-	else
-		rc = msm_sensor_match_id(s_ctrl);
+
+	} else {
+	         
+ 		rc = msm_sensor_match_id(s_ctrl);
+	}
 	if (rc < 0)
 		pr_err("%s:%d match id failed rc %d\n", __func__, __LINE__, rc);
 	return rc;
