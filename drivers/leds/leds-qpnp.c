@@ -10,7 +10,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
-
+#define DEBUG
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -562,6 +562,11 @@ static u32 kpdbl_master_period_us;
 DECLARE_BITMAP(kpdbl_leds_in_use, NUM_KPDBL_LEDS);
 static bool is_kpdbl_master_turn_on;
 
+// wangjun@wind-mobi.com 20171101 end
+static unsigned long greenLedBlinking =0;
+// wangjun@wind-mobi.com 20171101 end
+
+
 static int
 qpnp_led_masked_write(struct qpnp_led_data *led, u16 addr, u8 mask, u8 val)
 {
@@ -905,7 +910,16 @@ static int qpnp_mpp_set(struct qpnp_led_data *led)
 		}
 		if (led->mpp_cfg->pwm_mode == PWM_MODE) {
 			/*config pwm for brightness scaling*/
-			period_us = led->mpp_cfg->pwm_cfg->pwm_period_us;
+
+            period_us = led->mpp_cfg->pwm_cfg->pwm_period_us;
+            //wangjun@wind-mobi.com 20171101 begin
+            if(greenLedBlinking)
+            {
+                period_us = 2500000; // 2.5s
+                printk("[wjwind] period_us = %d, led->cdev.brightness = %d \n",period_us,led->cdev.brightness);
+            }
+            //wangjun@wind-mobi.com 20171101 end
+            
 			if (period_us > INT_MAX / NSEC_PER_USEC) {
 				duty_us = (period_us * led->cdev.brightness) /
 					LED_FULL;
@@ -1810,6 +1824,9 @@ static void qpnp_led_set(struct led_classdev *led_cdev,
 	if (value > led->cdev.max_brightness)
 		value = led->cdev.max_brightness;
 
+    //wangjun@wind-mobi.com 20171101 begin
+    greenLedBlinking = 0;
+    //wangjun@wind-mobi.com 20171101 end
 	led->cdev.brightness = value;
 	if (led->in_order_command_processing)
 		queue_work(led->workqueue, &led->work);
@@ -2653,6 +2670,22 @@ static void led_blink(struct qpnp_led_data *led,
 				"KPDBL set brightness failed (%d)\n", rc);
 		}
 	}
+    // wangjun@wind-mobi.com 20171101 begin
+    else
+    {
+        if (led->id == QPNP_ID_LED_MPP) {
+            if(greenLedBlinking)
+           	    led->cdev.brightness = 51;
+            else
+                led->cdev.brightness = 0;
+        	if (led->in_order_command_processing)
+        		queue_work(led->workqueue, &led->work);
+        	else
+        		schedule_work(&led->work);
+        }
+
+    }
+    // wangjun@wind-mobi.com 20171101 end
 	mutex_unlock(&led->lock);
 }
 
@@ -2666,6 +2699,9 @@ static ssize_t blink_store(struct device *dev,
 	ssize_t ret = -EINVAL;
 
 	ret = kstrtoul(buf, 10, &blinking);
+    //wangjun@wind-mobi.com 20171101 begin
+    greenLedBlinking = blinking;
+    //wangjun@wind-mobi.com 20171101 end
 	if (ret)
 		return ret;
 	led = container_of(led_cdev, struct qpnp_led_data, cdev);
@@ -4042,6 +4078,15 @@ static int qpnp_leds_probe(struct spmi_device *spmi)
 					&pwm_attr_group);
 				if (rc)
 					goto fail_id_check;
+                //wangjun@wind-mobi.com 20171101 begin 
+                if (!led->mpp_cfg->pwm_cfg->use_blink)
+                {
+                    rc = sysfs_create_group(&led->cdev.dev->kobj,
+    					&blink_attr_group);
+                    if (rc)
+    					goto fail_id_check;
+                }
+                //wangjun@wind-mobi.com 20171101 end
 			}
 			if (led->mpp_cfg->pwm_cfg->use_blink) {
 				rc = sysfs_create_group(&led->cdev.dev->kobj,
@@ -4169,8 +4214,17 @@ static int qpnp_leds_remove(struct spmi_device *spmi)
 		case QPNP_ID_RGB_GREEN:
 		case QPNP_ID_RGB_BLUE:
 			if (led_array[i].rgb_cfg->pwm_cfg->mode == PWM_MODE)
+            {         
 				sysfs_remove_group(&led_array[i].cdev.dev->\
 					kobj, &pwm_attr_group);
+                //wangjun@wind-mobi.com 20171101 begin
+                if (!led_array[i].rgb_cfg->pwm_cfg->use_blink)
+                {
+                    sysfs_remove_group(&led_array[i].cdev.dev->\
+    					kobj, &blink_attr_group);
+                 }
+                //wangjun@wind-mobi.com 20171101 end
+            }
 			if (led_array[i].rgb_cfg->pwm_cfg->use_blink) {
 				sysfs_remove_group(&led_array[i].cdev.dev->\
 					kobj, &blink_attr_group);
