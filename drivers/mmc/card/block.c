@@ -89,6 +89,11 @@ MODULE_ALIAS("mmc:block");
 #define PCKD_TRGR_LOWER_BOUND		5
 #define PCKD_TRGR_PRECISION_MULTIPLIER	100
 
+//zhangkaiyuan@wind-mobi.com 20180103 begin
+//#undef pr_debug
+//#define pr_debug pr_info
+//zhangkaiyuan@wind-mobi.com 20180103 end
+
 static struct mmc_cmdq_req *mmc_cmdq_prep_dcmd(
 		struct mmc_queue_req *mqrq, struct mmc_queue *mq);
 static DEFINE_MUTEX(block_mutex);
@@ -4351,6 +4356,10 @@ static const struct mmc_fixup blk_fixups[] =
 	END_FIXUP
 };
 
+//zhangkaiyuan@wind-mobi.com 20180102 begin
+static int mmc_blk_done = 0;
+module_param(mmc_blk_done, int , 0444);
+
 static int mmc_blk_probe(struct mmc_card *card)
 {
 	struct mmc_blk_data *md, *part_md;
@@ -4375,7 +4384,10 @@ static int mmc_blk_probe(struct mmc_card *card)
 		cap_str, md->read_only ? "(ro)" : "");
 
 	if (mmc_blk_alloc_parts(card, md))
+	//{
+		//printk("mmc_blk_probe step1\n");
 		goto out;
+	//}
 
 	mmc_set_drvdata(card, md);
 
@@ -4383,11 +4395,17 @@ static int mmc_blk_probe(struct mmc_card *card)
 	mmc_set_bus_resume_policy(card->host, 1);
 #endif
 	if (mmc_add_disk(md))
+	//{
+		//printk("mmc_blk_probe step2\n");
 		goto out;
+	//}
 
 	list_for_each_entry(part_md, &md->part, part) {
 		if (mmc_add_disk(part_md))
-			goto out;
+		//{
+		//printk("mmc_blk_probe step3\n");
+		goto out;
+	   //}
 	}
 
 	pm_runtime_set_autosuspend_delay(&card->dev, MMC_AUTOSUSPEND_DELAY_MS);
@@ -4401,15 +4419,19 @@ static int mmc_blk_probe(struct mmc_card *card)
 		pm_runtime_set_active(&card->dev);
 		pm_runtime_enable(&card->dev);
 	}
-
+	
+    mmc_blk_done = 1;
+	//printk("mmc_blk_probe step5\n");
 	return 0;
 
  out:
 	mmc_blk_remove_parts(card, md);
 	mmc_blk_remove_req(md);
+	//printk("mmc_blk_probe step4\n");
+
 	return 0;
 }
-
+//zhangkaiyuan@wind-mobi.com 20180102 end
 static void mmc_blk_remove(struct mmc_card *card)
 {
 	struct mmc_blk_data *md = mmc_get_drvdata(card);
