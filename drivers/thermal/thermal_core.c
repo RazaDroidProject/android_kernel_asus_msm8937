@@ -65,6 +65,12 @@ static DEFINE_MUTEX(thermal_governor_lock);
 
 static struct thermal_governor *def_governor;
 
+//renyongwei@wind-mobi.com add 20180102 begin
+#define PCB_THERM_NAME "case_therm"
+struct device *asus_pcb_dev = NULL;
+struct thermal_zone_device *pcb_tz_asus = NULL;
+//renyongwei@wind-mobi.com add 20180102 end
+
 static struct thermal_governor *__find_governor(const char *name)
 {
 	struct thermal_governor *pos;
@@ -2263,6 +2269,14 @@ struct thermal_zone_device *thermal_zone_device_register(const char *type,
 			goto unregister;
 	}
 
+//renyongwei@wind-mobi.com add 20180102 begin
+	if(!strcmp(type, PCB_THERM_NAME)){
+		asus_pcb_dev = &tz->device;
+		pcb_tz_asus = to_thermal_zone(asus_pcb_dev);
+		printk("wind-log:asus get pcb case_therm thermel device\n");
+	}
+//renyongwei@wind-mobi.com add 20180102 end
+	
 	result = device_create_file(&tz->device, &dev_attr_temp);
 	if (result)
 		goto unregister;

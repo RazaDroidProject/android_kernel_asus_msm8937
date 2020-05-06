@@ -209,6 +209,11 @@
 
 /* QPNP ADC TM HC end */
 
+//renyongwei@wind-mobi.com add 20180102 begin
+extern struct thermal_zone_device *pcb_tz_asus;
+//extern unsigned long case_therm_temp;
+//renyongwei@wind-mobi.com add 20180102 end
+
 struct qpnp_adc_thr_info {
 	u8		status_low;
 	u8		status_high;
@@ -2808,6 +2813,29 @@ static struct thermal_zone_device_ops qpnp_adc_tm_thermal_ops = {
 	.get_trip_temp = qpnp_adc_tm_get_trip_temp,
 	.set_trip_temp = qpnp_adc_tm_set_trip_temp,
 };
+
+//renyongwei@wind-mobi.com add 20180102 begin
+int fake_pcbtemperature = 66666;
+int asus_thermal_get_temp(struct thermal_zone_device *thermal)
+{
+    int ret = 0;
+	long temperature = 0;
+	
+    if (thermal) {
+        ret = thermal->ops->get_temp(thermal, &temperature);
+        if (ret < 0) {
+            pr_err("asus_thermal_get_temp error!\n");
+            return ret;
+        }
+    }
+    if ((!strcmp(thermal->type, "csae_therm")) && (66666 != fake_pcbtemperature)) {
+        return fake_pcbtemperature;
+    }
+	printk("wind-log:asus_thermal_get_temp temperature=%ld\n",temperature);//asus_get_temp
+	//printk("wind-log:asus_thermal_get_temp-case_therm_temp=%ld\n",case_therm_temp);//adc_get_temp
+    return temperature * 1000;
+}
+//renyongwei@wind-mobi.com add 20180102 end
 
 int32_t qpnp_adc_tm_channel_measure(struct qpnp_adc_tm_chip *chip,
 					struct qpnp_adc_tm_btm_param *param)
