@@ -1,0 +1,1 @@
+obj-$(CONFIG_LEADCORE_FINGERPRINT) += leadcore/
