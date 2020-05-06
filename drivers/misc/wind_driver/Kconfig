@@ -8,7 +8,7 @@ config WIND_DEVICE_INFO
 	help
 		Select y or n
 
-
+source "drivers/misc/wind_driver/fingerprint/Kconfig"
 
 ## lihaiyan@wind-mobi.com 20171101 ---
 
