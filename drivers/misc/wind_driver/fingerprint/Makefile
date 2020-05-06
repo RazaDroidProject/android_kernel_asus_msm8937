@@ -1,2 +1,3 @@
 obj-$(CONFIG_LEADCORE_FINGERPRINT) += leadcore/
 obj-$(CONFIG_MICROARRAY_FINGERPRINT) += microarray/
+obj-$(CONFIG_SUNWAVE_FINGERPRINT) += sunwave/
