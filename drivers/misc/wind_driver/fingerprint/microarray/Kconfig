@@ -1,0 +1,23 @@
+## add by microarray start
+# Copyright (C) MicroArray  
+# MicroArray Fprint Driver Code
+# Kconfig
+# Date: 2017-3-15
+# Version: v4.0.06
+# Author: guq
+# Contact: guq@microarray.com.cn
+
+config MICROARRAY_FINGERPRINT
+	tristate "microarray Fingerprint"
+	default n
+	help
+	  If you say Y to this option, support will be included for 
+	  the Microarray's fingerprint sensor. This driver supports 
+	  both REE and TEE. If in REE, CONFIG_SPI_SPIDEV must be set 
+	  to use the standard 'spidev' driver.
+	
+	  This driver can also be built as a module. If so, the module
+	  will be called 'MICROARRAY'.
+## add by microarray end	  
+	  
+	  

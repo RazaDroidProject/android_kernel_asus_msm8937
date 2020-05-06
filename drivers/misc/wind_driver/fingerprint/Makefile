@@ -1,1 +1,2 @@
 obj-$(CONFIG_LEADCORE_FINGERPRINT) += leadcore/
+obj-$(CONFIG_MICROARRAY_FINGERPRINT) += microarray/
