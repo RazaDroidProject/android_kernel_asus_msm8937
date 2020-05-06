@@ -94,3 +94,4 @@ obj-$(CONFIG_TOUCHSCREEN_HIMAX_CHIPSET)	+= hxchipset/
 obj-$(CONFIG_TOUCHSCREEN_FTS)		+= focaltech_touch/
 
 obj-$(CONFIG_TOUCHSCREEN_GT917D)		+= gt917d/
+obj-$(CONFIG_TOUCHSCREEN_FT5346I)		+= ft5346i/
