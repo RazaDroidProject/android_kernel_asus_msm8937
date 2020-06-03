@@ -1,0 +1,17 @@
+# Asus configuration options
+
+config MACH_ASUS_MSM8937
+	bool "Asus MSM8937"
+	depends on ARCH_MSM8937
+	help
+	  Support for MSM8937 Asus variants
+
+menu "Asus board selection"
+
+config MACH_ASUS_X00P
+	bool "X00P board"
+	select MACH_ASUS_MSM8937
+	help
+	  Support for Asus Max M1
+
+endmenu
