@@ -1,3 +1,7 @@
+ifeq ($(CONFIG_MACH_ASUS_MSM8937),y)
+dtb-$(CONFIG_MACH_ASUS_X00P) += msm8917-pmi8940-mtp.dtb \
+	msm8937-pmi8940-mtp.dtb
+else
 dtb-$(CONFIG_ARCH_MSM8996) += msm8996-v2-pmi8994-mtp.dtb \
 	msm8996-v2-pmi8994-pmk8001-mtp.dtb \
 	msm8996-v2-pmi8994-pm8004-mtp.dtb \
@@ -302,7 +306,7 @@ dtb-$(CONFIG_ARCH_MSM8909) += msm8909-pm8916-mtp.dtb \
 	msm8909-1gb-cdp.dtb \
 	apq8009-ext-codec-dragon.dtb \
 	apq8009-dragon.dtb
-
+endif
 ifeq ($(CONFIG_ARM64),y)
 always          := $(dtb-y)
 subdir-y        := $(dts-dirs)
