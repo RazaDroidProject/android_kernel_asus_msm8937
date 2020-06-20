@@ -1152,5 +1152,6 @@ source "drivers/input/touchscreen/hxchipset/Kconfig"
 
 source "drivers/input/touchscreen/gt917d/Kconfig"
 source "drivers/input/touchscreen/ft5346i/Kconfig"
+source "drivers/input/touchscreen/HX852xES/Kconfig"
 
 endif
