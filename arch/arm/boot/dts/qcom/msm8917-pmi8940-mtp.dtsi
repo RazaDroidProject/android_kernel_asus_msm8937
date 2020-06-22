@@ -15,12 +15,88 @@
 #include "msm8917-mtp.dtsi"
 
 &soc {
-	led_flash0: qcom,camera-flash {
+/*******zhenglihong@wind-mobi.com 20171017 begin*************/
+	led_flash0: qcom,camera-flash@0 {
 		cell-index = <0>;
 		compatible = "qcom,camera-flash";
 		qcom,flash-type = <1>;
-		qcom,flash-source = <&pmi8940_flash0 &pmi8940_flash1>;
-		qcom,torch-source = <&pmi8940_torch0 &pmi8940_torch1>;
+		qcom,flash-source = <&pmi8940_flash0>;
+		qcom,torch-source = <&pmi8940_torch0>;
 		qcom,switch-source = <&pmi8940_switch>;
+		status = "ok";
+	};
+	
+	led_flash1: qcom,camera-flash@1 {
+		cell-index = <1>;
+		compatible = "qcom,camera-flash";
+		qcom,flash-type = <1>;
+		qcom,flash-source = <&pmi8940_flash1>;
+		qcom,torch-source = <&pmi8940_torch1>;
+		qcom,switch-source = <&pmi8940_switch>;
+		status = "ok";
 	};
 };
+/*******zhenglihong@wind-mobi.com 20171017 end*************/
+//hebiao@wind-mobi.com 20171208 begin
+&mdss_dsi0 {
+	lab-supply = <&lab_regulator>;
+	ibb-supply = <&ibb_regulator>;
+};
+ 
+&labibb {
+	status = "ok";
+	qpnp,qpnp-labibb-mode = "lcd";
+};
+
+&ibb_regulator {
+	qcom,qpnp-ibb-discharge-resistor = <32>;
+};
+
+
+&dsi_panel_pwr_supply {
+	qcom,panel-supply-entry@2 {
+		reg = <2>;
+		qcom,supply-name = "lab";
+		qcom,supply-min-voltage = <4600000>;
+		qcom,supply-max-voltage = <6000000>;
+		qcom,supply-enable-load = <100000>;
+		qcom,supply-disable-load = <100>;
+        qcom,supply-pre-on-sleep =<0>; 
+        qcom,supply-post-on-sleep =<1>;
+	};
+
+	qcom,panel-supply-entry@3 {
+		reg = <3>;
+		qcom,supply-name = "ibb";
+		qcom,supply-min-voltage = <4600000>;
+		qcom,supply-max-voltage = <6000000>;
+		qcom,supply-enable-load = <100000>;
+		qcom,supply-disable-load = <100>;
+        qcom,supply-pre-on-sleep =<0>; 
+		qcom,supply-post-on-sleep = <40>;
+	};
+};
+//hebiao@wind-mobi.com 20171208 end 
+
+/* wangjun@wind-mobi.com 20171020 begin */
+&pmi8940_charger {
+	qcom,battery-data = <&mtp_batterydata>;	/* lvwenkang@wind-mobi.com 20171021  */
+	qcom,chg-led-sw-controls;
+	qcom,chg-led-support;
+};
+/* wangjun@wind-mobi.com 20171020 end */
+
+ /* lvwenkang@wind-mobi.com 20180116 begin*/
+/{
+	mtp_batterydata: qcom,battery-data {
+		qcom,batt-id-range-pct = <60>;     //修改电池id阻抗容忍范围，兼容两块电池，使100kohm和50kohm都能充电
+		#include "batterydata-ascent-3700mAh.dtsi"     //liulinsheng@wind-mobi.com 
+		#include "3340624_Wind_E300cos_4000mAh_averaged_MasterSlave_Feb20th2018_PMI8940.dtsi"     //liulinsheng@wind-mobi.com 
+		
+	};
+};
+&pmi8940_fg {
+	qcom,battery-data = <&mtp_batterydata>;
+};
+
+ /* lvwenkang@wind-mobi.com 20180116 end*/

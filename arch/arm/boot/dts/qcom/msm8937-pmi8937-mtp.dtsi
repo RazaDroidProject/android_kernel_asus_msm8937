@@ -16,14 +16,28 @@
 #include "msm8937-audio-mtp.dtsi"
 
 &soc {
-	led_flash0: qcom,camera-flash {
+//zhenglihong@wind-mobi.com 20171017 begin
+	led_flash0: qcom,camera-flash@0 {
 		cell-index = <0>;
 		compatible = "qcom,camera-flash";
 		qcom,flash-type = <1>;
-		qcom,flash-source = <&pmi8937_flash0 &pmi8937_flash1>;
-		qcom,torch-source = <&pmi8937_torch0 &pmi8937_torch1>;
+		qcom,flash-source = <&pmi8937_flash0>;
+		qcom,torch-source = <&pmi8937_torch0>;
 		qcom,switch-source = <&pmi8937_switch>;
+		status = "ok";
 	};
+	
+	led_flash1: qcom,camera-flash@1 {
+		cell-index = <1>;
+		compatible = "qcom,camera-flash";
+		qcom,flash-type = <1>;
+		qcom,flash-source = <&pmi8937_flash1>;
+		qcom,torch-source = <&pmi8937_torch1>;
+		qcom,switch-source = <&pmi8937_switch>;
+		status = "ok";
+	};
+//zhenglihong@wind-mobi.com 20171017 end
+
 };
 
 /{

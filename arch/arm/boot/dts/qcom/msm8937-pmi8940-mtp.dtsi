@@ -16,27 +16,29 @@
 #include "msm8937-audio-mtp.dtsi"
 
 &soc {
-	led_flash0: qcom,camera-flash {
+/*******zhenglihong@wind-mobi.com 20171017 begin*************/
+	led_flash0: qcom,camera-flash@0 {
 		cell-index = <0>;
 		compatible = "qcom,camera-flash";
 		qcom,flash-type = <1>;
-		qcom,flash-source = <&pmi8940_flash0 &pmi8940_flash1>;
-		qcom,torch-source = <&pmi8940_torch0 &pmi8940_torch1>;
+		qcom,flash-source = <&pmi8940_flash0>;
+		qcom,torch-source = <&pmi8940_torch0>;
 		qcom,switch-source = <&pmi8940_switch>;
+		status = "ok";
+	};
+	
+	led_flash1: qcom,camera-flash@1 {
+		cell-index = <1>;
+		compatible = "qcom,camera-flash";
+		qcom,flash-type = <1>;
+		qcom,flash-source = <&pmi8940_flash1>;
+		qcom,torch-source = <&pmi8940_torch1>;
+		qcom,switch-source = <&pmi8940_switch>;
+		status = "ok";
 	};
 };
+/*******zhenglihong@wind-mobi.com 20171017 end*************/
 
-/{
-	mtp_batterydata: qcom,battery-data {
-		qcom,batt-id-range-pct = <15>;
-		#include "batterydata-itech-3000mah.dtsi"
-		#include "batterydata-ascent-3450mAh.dtsi"
-	};
-};
-
-&pmi8940_fg {
-	qcom,battery-data = <&mtp_batterydata>;
-};
 
 &pmi8940_charger {
 	qcom,battery-data = <&mtp_batterydata>;
@@ -83,3 +85,16 @@
 		qcom,supply-post-on-sleep = <20>;
 	};
 };
+ /* lvwenkang@wind-mobi.com 20180116 begin*/
+/{
+	mtp_batterydata: qcom,battery-data {
+		qcom,batt-id-range-pct = <60>;   //修改电池id阻抗容忍范围，兼容两块电池，使100kohm和50kohm都能充电
+		#include "batterydata-ascent-3700mAh.dtsi"     //liulinsheng@wind-mobi.com 
+		#include "3340624_Wind_E300cos_4000mAh_averaged_MasterSlave_Feb20th2018_PMI8940.dtsi"     //liulinsheng@wind-mobi.com 
+	};
+};
+&pmi8940_fg {
+	qcom,battery-data = <&mtp_batterydata>;
+};
+
+ /* lvwenkang@wind-mobi.com 20180116 end*/

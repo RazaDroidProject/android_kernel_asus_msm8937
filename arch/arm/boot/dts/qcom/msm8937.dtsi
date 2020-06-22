@@ -50,7 +50,9 @@
 		other_ext_mem: other_ext_region@0 {
 			compatible = "removed-dma-pool";
 			no-map;
-			reg = <0x0 0x85b00000 0x0 0xd00000>;
+                        /* add by leadcore start */
+			reg = <0x0 0x84a00000 0x0 0x1E00000>;
+                        /* add by leadcore start */
 		};
 
 		modem_mem: modem_region@0 {
@@ -1138,7 +1140,10 @@
 		qcom,axi-prefetch-enable;
 		qcom,enable-sdp-typec-current-limit;
 		qcom,hsusb-otg-delay-lpm;
-
+		/* zhangkaiyan@wind-mobi.com 20171211 begin */
+		qcom,hsusb-otg-phy-init-seq = <0x44 0x80 0x65 0x81 0x33 0x82 0x33 0x83 0xffffffff>;
+		qcom,hsusb-otg-phy-host-init-seq = <0x44 0x80 0x65 0x81 0x33 0x82 0x33 0x83 0xffffffff>;
+        /* zhangkaiyan@wind-mobi.com 20171211 end */
 		qcom,msm-bus,name = "usb2";
 		qcom,msm-bus,num-cases = <3>;
 		qcom,msm-bus,num-paths = <1>;
@@ -1543,9 +1548,11 @@
 		qcom,ce-opp-freq = <100000000>;
 	};
 
-	qcom_seecom: qseecom@85b00000 {
+	qcom_seecom: qseecom@84A00000 {
 		compatible = "qcom,qseecom";
-		reg = <0x85b00000 0x800000>;
+                /* add by leadcore start */
+		reg = <0x84A00000 0x1900000>;
+                /* add by leadcore end */
 		reg-names = "secapp-region";
 		qcom,hlos-num-ce-hw-instances = <1>;
 		qcom,hlos-ce-hw-instance = <0>;

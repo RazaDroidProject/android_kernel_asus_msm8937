@@ -116,6 +116,18 @@
 				qcom,hw-settle-time = <0>;
 				qcom,fast-avg-setup = <0>;
 			};
+			/* lihaiyan@wind-mobi.com for adapter id +++ */
+			chan@10 {
+				label = "mpp1";
+				reg = <0x10>;    					//channel for MPP1
+				qcom,decimation = <0>;
+				qcom,pre-div-channel-scaling = <0>;  	//use 1:1 scaling to keep input voltage with max voltage: 1.8v
+				qcom,calibration-type = "absolute";
+				qcom,scale-function = <0>;  //0
+				qcom,hw-settle-time = <4>;
+				qcom,fast-avg-setup = <2>;
+			};
+			/* lihaiyan@wind-mobi.com for adapter id --- */
 
 			chan@43 {
 				label = "usb_dp";
@@ -152,7 +164,13 @@
 			mpp@a000 {
 				reg = <0xa000 0x100>;
 				qcom,pin-num = <1>;
-				status = "disabled";
+				/* lihaiyan@wind-mobi.com for adapter id +++ */
+				qcom,mode = <4>;  		//A-input
+				qcom,src-sel = <0>; 	        //MPP Constant
+				qcom,ain-route = <0>; 	        //QPNP_PIN_AIN_AMUX_CH5 = 0 for mpp1
+				qcom,master-en = <1>; 	        //Enable MPP
+				status = "okay"; 
+				/* lihaiyan@wind-mobi.com for adapter id --- */
 			};
 
 			mpp@a100 {
@@ -175,7 +193,7 @@
 			#size-cells = <1>;
 
 			qcom,iterm-ma = <100>;
-			qcom,float-voltage-mv = <4200>;
+			qcom,float-voltage-mv = <4350>;       /* lvwenkang@wind-mobi.com 20171019 */
 			qcom,resume-delta-mv = <200>;
 			qcom,chg-inhibit-fg;
 			qcom,rparasitic-uohm = <100000>;
@@ -184,8 +202,10 @@
 			qcom,pmic-revid = <&pmi8940_revid>;
 			qcom,force-aicl-rerun;
 			qcom,aicl-rerun-period-s = <180>;
-			qcom,autoadjust-vfloat;
-
+			
+			qcom,usbin-vadc = <&pmi8940_vadc>;          //liulinsheng@wind-mobi.com usbin
+            qcom,jeita-temp-hard-limit =<1>;  			//liulinsheng@wind-mobi.com
+			qcom,mpp1-vadc = <&pmi8940_vadc>;	
 			qcom,chgr@1000 {
 				reg = <0x1000 0x100>;
 				interrupts =	<0x2 0x10 0x0>,
@@ -286,14 +306,23 @@
 			compatible = "qcom,qpnp-fg";
 			#address-cells = <1>;
 			#size-cells = <1>;
-			qcom,resume-soc = <95>;
+			qcom,resume-soc = <99>;
 			status = "okay";
 			qcom,bcl-lm-threshold-ma = <127>;
 			qcom,bcl-mh-threshold-ma = <405>;
-			qcom,fg-iterm-ma = <150>;
-			qcom,fg-chg-iterm-ma = <100>;
+			qcom,fg-iterm-ma = <240>;
+			qcom,fg-chg-iterm-ma = <150>;                        //liulinsheng@wind-mobi.com  
 			qcom,pmic-revid = <&pmi8940_revid>;
-			qcom,fg-cutoff-voltage-mv = <3500>;
+			qcom,fg-cutoff-voltage-mv = <3400>;    				//liulinsheng@wind-mobi.com 20171213
+			qcom,irq-volt-empty-mv = <3000>;					//liulinsheng@wind-mobi.com 20171213
+			//liulinsheng@wind-mobi.com
+			qcom,fg-cc-cv-threshold-mv = <4330>;
+			qcom,hot-bat-decidegc = <600>;
+			qcom,cold-bat-decidegc = <0>;
+			qcom,warm-bat-decidegc = <600>;
+			qcom,cool-bat-decidegc = <0>;
+			qcom,hold-soc-while-full = <1>;
+			//liulinsheng@wind-mobi.com 
 			qcom,cycle-counter-en;
 			qcom,capacity-learning-on;
 
@@ -377,6 +406,29 @@
 			compatible = "qcom,leds-qpnp";
 			reg = <0xa100 0x100>;
 			label = "mpp";
+            
+            /* wangjun@wind-mobi.com 20171019 begin*/
+            qcom,led_mpp_2 {
+				label = "mpp";
+				linux,name = "green";  
+                qcom,max-current = <40>; 
+                qcom,id = <6>;
+                
+                qcom,current-setting = <5>; 
+                qcom,source-sel = <8>;
+                qcom,mode-ctrl = <0x60>;
+                
+                qcom,mode = "pwm";
+                pwms = <&pmi8940_pwm 0 0>;
+                qcom,pwm-us = <10000>; 
+                qcom,pwm-channel = <0>;
+                linux,default-trigger = "none";  
+				qcom,default-state = "off";  
+                pwm-names = "green"; 
+                
+			};
+
+            /* wangjun@wind-mobi.com 20171019 end*/
 		};
 	};
 
@@ -387,13 +439,17 @@
 		#size-cells = <1>;
 
 		pmi8940_pwm: pwm@b000 {
-			status = "disabled";
+			
 			compatible = "qcom,qpnp-pwm";
 			reg = <0xb000 0x100>;
 			reg-names = "qpnp-lpg-channel-base";
 			qcom,channel-id = <0>;
 			qcom,supported-sizes = <6>, <9>;
 			#pwm-cells = <2>;
+            /* wangjun@wind-mobi.com 20171019 begin*/
+            qcom,dtest-line = <1>;   //select DTEST1
+            qcom,dtest-output = <1>; //select DTEST1  
+            /* wangjun@wind-mobi.com 20171019 end*/
 		};
 
 		labibb: qpnp-labibb-regulator {
@@ -473,6 +529,7 @@
 			compatible = "qcom,qpnp-wled";
 			reg = <0xd800 0x100>,
 				<0xd900 0x100>;
+			//qcom,en-cabc; //hebiao modified at 20171204
 			reg-names = "qpnp-wled-ctrl-base",
 					"qpnp-wled-sink-base";
 			interrupts = <0x3 0xd8 0x2>;
@@ -494,10 +551,12 @@
 			qcom,fs-curr-ua = <20000>;
 			qcom,en-phase-stag;
 			qcom,led-strings-list = [00 01];
-			qcom,en-ext-pfet-sc-pro;
+            /* wangjun@wind-mobi.com 20171019 begin*/
+			// qcom,en-ext-pfet-sc-pro;
+            /* wangjun@wind-mobi.com 20171019 end*/
 			qcom,cons-sync-write-delay-us = <1000>;
 		};
-
+            /**********zhenglihong@wind-mobi.com 20171208 begin***************/
 		flash_led: qcom,leds@d300 {
 			compatible = "qcom,qpnp-flash-led";
 			status = "okay";
@@ -529,7 +588,7 @@
 				qcom,max-current = <1000>;
 				qcom,duration = <1280>;
 				qcom,id = <0>;
-				qcom,current = <625>;
+				qcom,current = <800>;
 			};
 
 			pmi8940_flash1: qcom,flash_1 {
@@ -537,10 +596,10 @@
 				qcom,led-name = "led:flash_1";
 				qcom,default-led-trigger =
 						"flash1_trigger";
-				qcom,max-current = <1000>;
+				qcom,max-current = <300>;
 				qcom,duration = <1280>;
 				qcom,id = <1>;
-				qcom,current = <625>;
+				qcom,current = <80>;
 			};
 
 			pmi8940_torch0: qcom,torch_0 {
@@ -550,7 +609,7 @@
 						"torch0_trigger";
 				qcom,max-current = <200>;
 				qcom,id = <0>;
-				qcom,current = <120>;
+				qcom,current = <108>;
 			};
 
 			pmi8940_torch1: qcom,torch_1 {
@@ -560,7 +619,7 @@
 						"torch1_trigger";
 				qcom,max-current = <200>;
 				qcom,id = <1>;
-				qcom,current = <120>;
+				qcom,current = <200>;
 			};
 
 			pmi8940_switch: qcom,switch {
@@ -571,13 +630,14 @@
 				qcom,max-current = <1000>;
 				qcom,duration = <1280>;
 				qcom,id = <2>;
-				qcom,current = <625>;
+				qcom,current = <800>;
 				reg0 {
 					regulator-name = "pon_spare_reg";
 				};
 			};
 		};
-
+        /**********zhenglihong@wind-mobi.com 20171208 end***************/
+        /*lihaiyan@wind-mobi.com 20171017 +++*/
 		pmi_haptic: qcom,haptic@c000 {
 			compatible = "qcom,qpnp-haptic";
 			reg = <0xc000 0x100>;
@@ -588,9 +648,9 @@
 			vcc_pon-supply = <&pon_perph_reg>;
 			qcom,play-mode = "direct";
 			qcom,wave-play-rate-us = <5263>;
-			qcom,actuator-type = "lra";
+			qcom,actuator-type = "erm";
 			qcom,wave-shape = "square";
-			qcom,vmax-mv = <2000>;
+			qcom,vmax-mv = <3250>;  /* 2000 */
 			qcom,ilim-ma = <800>;
 			qcom,sc-deb-cycles = <8>;
 			qcom,int-pwm-freq-khz = <505>;
@@ -601,11 +661,14 @@
 			qcom,wave-samples = [3e 3e 3e 3e 3e 3e 3e 3e];
 			qcom,wave-rep-cnt = <1>;
 			qcom,wave-samp-rep-cnt = <1>;
+			/*
 			qcom,lra-auto-res-mode="qwd";
 			qcom,lra-high-z="opt1";
 			qcom,lra-res-cal-period = <4>;
 			qcom,correct-lra-drive-freq;
-			qcom,misc-trim-error-rc19p2-clk-reg-present;
+			qcom,misc-trim-error-rc19p2-clk-reg-present; 
+			*/
+			/*lihaiyan@wind-mobi.com 20171017 ---*/
 		};
 	};
 };

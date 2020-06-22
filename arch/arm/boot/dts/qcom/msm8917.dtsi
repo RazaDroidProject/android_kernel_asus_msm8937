@@ -40,9 +40,10 @@
 		smd21 = &smdtty_data21;
 		smd36 = &smdtty_loopback;
 		spi3 = &spi_3;
+		spi5 = &spi_5; /* lihaiyan@wind-mobi.com for spi*/
 		spi6 = &spi_6;
 		i2c2 = &i2c_2;
-		i2c5 = &i2c_5;
+		//i2c5 = &i2c_5; /* lihaiyan@wind-mobi.com for spi */
 		i2c3 = &i2c_3;
 		i2c4 = &i2c_4;
 		sdhc1 = &sdhc_1; /* SDC1 eMMC slot */
@@ -74,7 +75,9 @@
 		other_ext_mem: other_ext_region@0 {
 			compatible = "removed-dma-pool";
 			no-map;
-			reg = <0x0 0x85b00000 0x0 0xd00000>;
+                        /* added by leadcore start  */
+			reg = <0x0 0x84a00000 0x0 0x1E00000>;
+                        /* added by leadcore end  */
 		};
 
 		modem_mem: modem_region@0 {
@@ -616,12 +619,15 @@
 		status = "disabled";
 	};
 
+	
 	i2c_5: i2c@7af5000 { /* BLSP2 QUP1 */
 		compatible = "qcom,i2c-msm-v2";
 		#address-cells = <1>;
 		#size-cells = <0>;
-		reg-names = "qup_phys_addr";
-		reg = <0x7af5000 0x600>;
+		/*  lihaiyan@wind-mobi.com 20171030 for spi +++ */
+		/*
+                reg-names = "qup_phys_addr";
+		//reg = <0x7af5000 0x600>;
 		interrupt-names = "qup_irq";
 		interrupts = <0 299 0>;
 		qcom,clk-freq-out = <400000>;
@@ -639,7 +645,10 @@
 		dmas = <&dma_blsp2 4 64 0x20000020 0x20>,
 			<&dma_blsp2 5 32 0x20000020 0x20>;
 		dma-names = "tx", "rx";
+	        */
+                /* lihaiyan@wind-mobi.com 20171030 for spi +++ */
 	};
+	
 
 	rpm_bus: qcom,rpm-smd {
 		compatible = "qcom,rpm-smd";
@@ -849,7 +858,10 @@
 		qcom,axi-prefetch-enable;
 		qcom,enable-sdp-typec-current-limit;
 		qcom,hsusb-otg-delay-lpm;
-
+		/* zhangkaiyan@wind-mobi.com 20171211 begin */
+		qcom,hsusb-otg-phy-init-seq = <0x44 0x80 0x65 0x81 0x33 0x82 0x33 0x83 0xffffffff>;
+                qcom,hsusb-otg-phy-host-init-seq = <0x44 0x80 0x65 0x81 0x33 0x82 0x33 0x83 0xffffffff>;
+        /* zhangkaiyan@wind-mobi.com 20171211 end */
 		qcom,msm-bus,name = "usb2";
 		qcom,msm-bus,num-cases = <3>;
 		qcom,msm-bus,num-paths = <1>;
@@ -1367,9 +1379,11 @@
 		qcom,ce-opp-freq = <100000000>;
 	};
 
-	qcom_seecom: qseecom@85b00000 {
+	qcom_seecom: qseecom@84A00000 {
 		compatible = "qcom,qseecom";
-		reg = <0x85b00000 0x800000>;
+		/* add by leadcore start */
+                reg = <0x84A00000 0x1900000>;
+		/* add by leadcore end */
 		reg-names = "secapp-region";
 		qcom,hlos-num-ce-hw-instances = <1>;
 		qcom,hlos-ce-hw-instance = <0>;
@@ -1591,6 +1605,65 @@
 		qcom,master-id = <86>;
 		status = "disabled";
 	};
+	
+	/* lihaiyan@wind-mobi.com for spi 20171026 +++ */
+	spi_5: spi@7af5000 { /* BLSP2 QUP1 */
+		compatible = "qcom,spi-qup-v2";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg-names = "spi_physical", "spi_bam_physical";
+		reg = <0x7af5000 0x600>,
+			<0x7ac4000 0x1f000>;
+		interrupt-names = "spi_irq", "spi_bam_irq";
+		interrupts = <0 299 0>, <0 239 0>;
+		spi-max-frequency = <50000000>;
+		pinctrl-names = "spi_default", "spi_sleep";
+		pinctrl-0 = <&spi5_default &spi5_cs0_active>;
+		pinctrl-1 = <&spi5_sleep &spi5_cs0_sleep>;
+		clocks = <&clock_gcc clk_gcc_blsp2_ahb_clk>,
+			<&clock_gcc clk_gcc_blsp2_qup1_spi_apps_clk>;
+		clock-names = "iface_clk", "core_clk";
+		qcom,infinite-mode = <0>;
+		qcom,use-bam;
+		qcom,use-pinctrl;
+		qcom,ver-reg-exists;
+		qcom,bam-consumer-pipe-index = <4>;
+		qcom,bam-producer-pipe-index = <5>;
+		
+		dmas = <&dma_blsp2 4 64 0x20000020 0x20>,
+			<&dma_blsp2 5 32 0x20000020 0x20>;
+		dma-names = "tx", "rx";
+		
+		qcom,master-id = <84>;
+		qcom,gpio-mosi = <&tlmm 16 0x00>;
+        	qcom,gpio-miso = <&tlmm 17 0x00>;
+        	qcom,gpio-clk  = <&tlmm 19 0x00>;
+        	qcom,gpio-cs0  = <&tlmm 18 0x00>;
+		status = "ok";
+		
+		isdbt@0 {
+			status = "ok";
+			compatible = "fci,isdbt";
+			reg = <0>;	
+			spi-max-frequency = <50000000>;
+			avdd-supply = <&pm8917_l10>;
+			dvdd-supply = <&pm8917_l5>;
+			reset-gpio = <&tlmm 47 0x00>;
+			enable-gpio = <&tlmm 92 0x00>;
+			ldo_enable = <&tlmm 95 0x00>;
+			bbm-xtal-freq = <26000>;
+			
+			//interrupt-parent = <&tlmm>;
+            		//interrupts = <48 2>;
+			irq-gpio = <&tlmm 48 0x1>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&dtv_int_default>;
+		};
+		
+	};
+	/* lihaiyan@wind-mobi.com for spi 20171026 --- */
+	
+	
 
 	spi_6: spi@7af6000 { /* BLSP2 QUP2 */
 		compatible = "qcom,spi-qup-v2";
