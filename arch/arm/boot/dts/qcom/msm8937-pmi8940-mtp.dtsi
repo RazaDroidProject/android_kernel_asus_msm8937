@@ -98,3 +98,5 @@
 };
 
  /* lvwenkang@wind-mobi.com 20180116 end*/
+
+#include "X00P/X00P-camera.dtsi"
