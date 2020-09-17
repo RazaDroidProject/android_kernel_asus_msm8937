@@ -238,6 +238,10 @@ static long mas_ioctl(struct file *filp, unsigned int cmd, unsigned long arg) {
 	case MA_POWER_ON:
             input_report_key(smas->input, FINGERPRINT_POWER_ON, 1);
             input_sync(smas->input);
+
+			//delay 10 ms to avoid screen on before key up,liuxiong@wind-mobi.com 20180919
+			msleep(10);
+
             input_report_key(smas->input, FINGERPRINT_POWER_ON, 0);
             input_sync(smas->input);                                               //power on
             printk("wind-madev: input key KEY_FN_F8, early wakeup\n");
@@ -836,6 +840,7 @@ static int __init mas_init(void)
 {
     int ret = 0;
     MALOGF("start");
+    printk("12345mafp\n");
     compatible = 1;
 /*    ret = mas_get_platform();
     if(ret){

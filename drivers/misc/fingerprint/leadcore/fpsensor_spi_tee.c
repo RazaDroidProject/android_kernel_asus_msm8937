@@ -578,7 +578,7 @@ static int fpsensor_dev_setup(fpsensor_data_t *fpsensor)
     int fpsensor_dev_minor = 0;
 
     FUNC_ENTRY();
-
+printk("12345fpsensor_dev_setup\n");
     if (fpsensor_dev_major) {
         dev_no = MKDEV(fpsensor_dev_major, fpsensor_dev_minor);
         ret = register_chrdev_region(dev_no, FPSENSOR_NR_DEVS, FPSENSOR_DEV_NAME);
@@ -690,7 +690,7 @@ static int fpsensor_probe(struct platform_device *pdev)
     fpsensor_data_t *fpsensor_dev = NULL;
 
     FUNC_ENTRY();
-
+printk("12345fpsensor_probe\n");
     /* Allocate driver data */
     fpsensor_dev = kzalloc(sizeof(*fpsensor_dev), GFP_KERNEL);
     if (!fpsensor_dev) {
@@ -799,8 +799,10 @@ static int __init fpsensor_init(void)
 {
     int status;
 
+    printk("%s, 12345Fpsensor driver.\n", __func__);
     FUNC_ENTRY();
     status = platform_driver_register(&fpsensor_driver);
+printk("12345Fpsensor status = %d\n", status);
     if (status < 0) {
         fpsensor_debug(ERR_LOG, "%s, Failed to register SPI driver.\n", __func__);
     }

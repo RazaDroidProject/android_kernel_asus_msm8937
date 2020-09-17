@@ -1,3 +1,0 @@
-source "drivers/misc/wind_driver/fingerprint/leadcore/Kconfig"
-source "drivers/misc/wind_driver/fingerprint/microarray/Kconfig"
-source "drivers/misc/wind_driver/fingerprint/sunwave/Kconfig"

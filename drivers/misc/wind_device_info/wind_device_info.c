@@ -525,6 +525,22 @@ static struct file_operations device_info_fops =
     .unlocked_ioctl = &device_info_unlocked_ioctl,
 };
 
+int g_ddr_size = 0;
+static int get_totalram(void)
+{
+	unsigned long totalram = 0;
+
+	totalram = totalram_pages * 4; //kB
+	if( totalram >=2097152)
+		g_ddr_size = 4; //greater than 2G
+	else if(totalram >=1048576 &&  totalram <2097152)
+		g_ddr_size = 2;
+	else
+		g_ddr_size = 0;
+
+	printk("g_ddr_size=%d,ram=%ldKB\n",g_ddr_size,totalram);
+	return g_ddr_size;
+}
 
 static int  device_info_init(void)
 {
@@ -558,6 +574,7 @@ static int  device_info_init(void)
 	attr_files_create(class_dev);
 	//lihaiyan just modify
 	//product_line_proc_init();
+	get_totalram();//liuxiong@wind-mobi.com 20180911
 
 	return 0;
 	

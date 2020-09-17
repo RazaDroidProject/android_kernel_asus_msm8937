@@ -144,19 +144,19 @@ void ma_spi_change(struct spi_device *spi, unsigned int  speed, int flag)
 
 
 int mas_do_some_for_probe(struct spi_device *spi){
-	int ret = 0;
+	//int ret = 0;
 	node = of_find_compatible_node(NULL, NULL, "microarray,fingerprint");
 	irq_gpio =  of_get_named_gpio(node, "mafp,gpio_irq",0);
-	pwr_gpio = of_get_named_gpio(node, "mafp,gpio-power", 0);
+	pwr_gpio = of_get_named_gpio(node, "mafp,gpio_power", 0);
 	printk("MAFP_ __func__ irq_gpio = %d pwr_gpio = %d\n", irq_gpio, pwr_gpio);
 	if(!gpio_is_valid(irq_gpio)){
 		MALOGE("irq gpio is in valied!\n ");
 		return -1;
 	}
-	if(!ret) {
-		MALOGE("pwr gpio is invalid\n");
+	//if(!ret) {
+		//MALOGE("pwr gpio is invalid\n");
 	//	return -2;
-	} 
+	//} 
         //ret = gpio_request(pwr_gpio, "ma_pwr");
         //if (ret)
         //{

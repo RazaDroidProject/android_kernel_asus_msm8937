@@ -613,6 +613,12 @@ config MEMORY_STATE_TIME
 	help
 	  Memory time statistics exported to /sys/kernel/memory_state_time
 
+config WIND_DEVICE_INFO
+	bool "CONFIG_WIND_DEVICE_INFO"
+	default y
+	help
+		Select y or n
+
 source "drivers/misc/c2port/Kconfig"
 source "drivers/misc/eeprom/Kconfig"
 source "drivers/misc/cb710/Kconfig"
@@ -627,7 +633,9 @@ source "drivers/misc/mic/Kconfig"
 source "drivers/misc/genwqe/Kconfig"
 source "drivers/misc/echo/Kconfig"
 source "drivers/misc/cxl/Kconfig"
-
-source "drivers/misc/wind_driver/Kconfig"
+source "drivers/misc/fingerprint/leadcore/Kconfig"
+source "drivers/misc/fingerprint/microarray/Kconfig"
+source "drivers/misc/fingerprint/sunwave/Kconfig"
+source "drivers/misc/dtv/fc8350/Kconfig"
 
 endmenu

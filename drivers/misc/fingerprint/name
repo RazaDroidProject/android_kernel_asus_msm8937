@@ -1,0 +1,27 @@
+sunwave/sf_ctl.c:1225:    sf_ctl_dev.input->name = "sf-keys";
+sunwave/sf_ctl.c:1226:    __set_bit(EV_KEY  , sf_ctl_dev.input->evbit );
+sunwave/sf_ctl.c:1227:    __set_bit(KEY_HOMEPAGE, sf_ctl_dev.input->keybit);
+sunwave/sf_ctl.c:1228:    __set_bit(KEY_MENU, sf_ctl_dev.input->keybit);
+sunwave/sf_ctl.c:1229:    __set_bit(KEY_BACK, sf_ctl_dev.input->keybit);
+sunwave/sf_ctl.c:1230:    __set_bit(KEY_FN_F5, sf_ctl_dev.input->keybit);
+sunwave/sf_ctl.c:1231:    __set_bit(KEY_FN_F6, sf_ctl_dev.input->keybit);
+sunwave/sf_ctl.c:1232:    __set_bit(KEY_FN_F7, sf_ctl_dev.input->keybit);
+sunwave/sf_ctl.c:1233:    __set_bit(KEY_ENTER, sf_ctl_dev.input->evbit );
+sunwave/sf_ctl.c:1234:    __set_bit(KEY_FN_F1, sf_ctl_dev.input->keybit);
+sunwave/sf_ctl.c:1235:    __set_bit(KEY_FN_F3, sf_ctl_dev.input->keybit);
+sunwave/sf_ctl.c:1236:    __set_bit(KEY_FN_F4, sf_ctl_dev.input->keybit);
+sunwave/sf_ctl.c:1237:    __set_bit(KEY_FN_F2, sf_ctl_dev.input->keybit);
+sunwave/sf_ctl.c:1238:    __set_bit(KEY_WAKEUP, sf_ctl_dev.input->keybit);
+sunwave/sf_ctl.c:1239:	__set_bit(KEY_FN_F8, sf_ctl_dev.input->keybit); //zhangkaiyuan@wind-mobi.com 20180208
+microarray/madev.c:141:    set_bit(EV_KEY, input->evbit);
+microarray/madev.c:142:    set_bit(FINGERPRINT_SWIPE_UP, input->keybit); //单触
+microarray/madev.c:143:    set_bit(FINGERPRINT_SWIPE_DOWN, input->keybit);
+microarray/madev.c:144:    set_bit(FINGERPRINT_SWIPE_LEFT, input->keybit);
+microarray/madev.c:145:    set_bit(FINGERPRINT_SWIPE_RIGHT, input->keybit);
+microarray/madev.c:146:    set_bit(FINGERPRINT_TAP, input->keybit);
+microarray/madev.c:147:    set_bit(FINGERPRINT_DTAP, input->keybit);
+microarray/madev.c:148:    set_bit(FINGERPRINT_LONGPRESS, input->keybit);
+microarray/madev.c:149:    set_bit(KEY_POWER, input->keybit);
+microarray/madev.c:150:    set_bit(FINGERPRINT_POWER_ON, input->keybit); //zhangkaiyuan@wind-mobi.com 20180306
+microarray/madev.c:152:    input->name = MA_CHR_DEV_NAME;
+microarray/madev.c:153:    input->id.bustype = BUS_SPI;

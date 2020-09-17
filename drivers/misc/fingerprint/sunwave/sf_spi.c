@@ -184,7 +184,7 @@ int __init sf_spi_platform_init(void)
 {
     int err = 0;
     spi_ctl = spi_busnum_to_master(SF_SPI_BUS_NUM);
-
+    printk("12345sunwave_fp\n");
     if (!spi_ctl) {
         xprintk(KERN_ERR, "there is no spi master for bus %d.\n", SF_SPI_BUS_NUM);
         //return (-ENODEV);

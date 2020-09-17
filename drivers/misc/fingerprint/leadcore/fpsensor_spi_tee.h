@@ -18,8 +18,8 @@
 #define FPSENSOR_NR_DEVS            1
 #define FPSENSOR_INPUT_NAME         "fpsensor_keys"
 #define ERR_LOG     (0)
-#define INFO_LOG    (1)
-#define DEBUG_LOG   (2)
+#define INFO_LOG    (0)
+#define DEBUG_LOG   (0)
 #define fpsensor_debug(level, fmt, args...) do { \
         if (fpsensor_debug_level >= level) {\
             printk( "[fpsensor] " fmt, ##args); \
