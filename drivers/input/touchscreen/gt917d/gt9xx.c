@@ -114,7 +114,7 @@ static s32 gtp_init_ext_watchdog(struct i2c_client *client);
 void gtp_esd_switch(struct i2c_client *, s32);
 #endif
 //hebiao@wind-mobi.com 20160907 begin
-#if GTP_CHARGER_SWITCH
+#if 0
 static struct workqueue_struct * gtp_charger_check_workqueue = NULL;
 
 static struct delayed_work gtp_charger_check_work;
@@ -3498,7 +3498,7 @@ static int goodix_ts_probe(struct i2c_client *client, const struct i2c_device_id
 #endif
 
 //hebiao@wind-mobi.com 20171123 begin
-#if GTP_CHARGER_SWITCH
+#if 0
     spin_lock_init(&ts->charger_lock);
     gtp_charger_switch(client, SWITCH_ON);
 #endif
@@ -3676,6 +3676,22 @@ static int goodix_ts_remove(struct i2c_client *client)
 }
 
 
+
+
+static void gt9xx_report_all_leave(struct goodix_ts_data *ts)
+{
+	s8 finger_count=0;
+
+	for (finger_count = 0; finger_count < 10; finger_count++)
+    {
+        gtp_touch_up(ts, finger_count);
+    }
+    input_sync(ts->input_dev);
+
+	return;
+}
+
+
 /*******************************************************
 Function:
     Early suspend function.
@@ -3700,7 +3716,7 @@ static void goodix_ts_suspend(struct goodix_ts_data *ts)
 #endif
 
 //hebiao@wind-mobi.com 20171123 begin
-#if GTP_CHARGER_SWITCH
+#if 0
            gtp_charger_switch(ts->client, SWITCH_OFF);
 #endif	
 
@@ -3738,6 +3754,7 @@ static void goodix_ts_suspend(struct goodix_ts_data *ts)
     // to avoid waking up while not sleeping
     //  delay 48 + 10ms to ensure reliability    
     msleep(58);   
+	gt9xx_report_all_leave(ts);
 }
 
 /*******************************************************
@@ -3801,7 +3818,7 @@ static void goodix_ts_resume(struct goodix_ts_data *ts)
        	 GTP_ERROR("Send config error.");
     	}
 #endif
-    	#if GTP_CHARGER_SWITCH
+    	#if 0
         gtp_charger_updateconfig(1);
         gtp_charger_switch(ts->client, SWITCH_ON);
 		#endif
@@ -4226,7 +4243,7 @@ static void gtp_esd_check_func(struct work_struct *work)
 }
 #endif
 //hebiao@wind-mobi.com 20171123 begin
-#if GTP_CHARGER_SWITCH
+#if 0
 extern bool usb_present;
 static void gtp_charger_updateconfig(s32 dir_update)
 {
@@ -4385,7 +4402,7 @@ static int __init goodix_ts_init(void)
 #endif
 
 //hebiao@wind-mobi.com 20160907 begin
-#if GTP_CHARGER_SWITCH
+#if 0
    INIT_DELAYED_WORK(&gtp_charger_check_work, gtp_charger_check_func);
    gtp_charger_check_workqueue = create_workqueue("gtp_charger_check");
 #endif

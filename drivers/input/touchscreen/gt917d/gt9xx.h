@@ -83,7 +83,7 @@ extern wind_device_info_t wind_device_info;
 #define GTP_GESTURE_WAKEUP    1    // gesture wakeup 
 #define GTP_GLOVE_MODE    1
 
-#define GTP_CHARGER_SWITCH    0  //lihaiyan@wind-mobi.com 20171202 
+#define GTP_CHARGER_SWITCH    1  //lihaiyan@wind-mobi.com 20171202 
 //hebiao@wind-mobi.com 20160907 end
 
 #define GTP_DEBUG_ON          1
@@ -93,7 +93,7 @@ extern wind_device_info_t wind_device_info;
 //hebiao@wind-mobi.com 20160907 begin
 #if GTP_GESTURE_WAKEUP
 #define	 KEY_GESTURE_DOUBLE_CLICK				KEY_F21
-#define  KEY_GESTURE_UP                         KEY_F21  
+#define  KEY_GESTURE_UP                         KEY_F24  
 #define  KEY_GESTURE_W                          KEY_F13
 #define  KEY_GESTURE_S                          KEY_F22
 #define  KEY_GESTURE_E                          KEY_F15
