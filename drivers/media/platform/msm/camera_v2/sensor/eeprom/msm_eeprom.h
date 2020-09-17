@@ -49,7 +49,6 @@ struct msm_eeprom_ctrl_t {
 };
 
 #endif
-
 //chengpeng@wind-mobi.com 20180128 begin
 struct msm_camera_i2c_reg_array hi556_readotp_init_regval[] = {
 	{0x0a00, 0x0000,0x00}, // stream off
@@ -275,7 +274,6 @@ struct msm_camera_i2c_reg_array hi556_readotp_init_regval[] = {
 	{0x0a1a, 0x0800,0x00},
 	{0x004e, 0x0100,0x00},	
 };
-
 struct msm_camera_i2c_reg_setting hi556_otp_read_init_setting = {
 	.reg_setting = hi556_readotp_init_regval,
 	.size = ARRAY_SIZE(hi556_readotp_init_regval),
@@ -283,7 +281,6 @@ struct msm_camera_i2c_reg_setting hi556_otp_read_init_setting = {
 	.data_type = MSM_CAMERA_I2C_WORD_DATA,
 	.delay = 2,
 };
-
 struct msm_camera_i2c_reg_array hi556_readotp_init_regval_start[] = {
 	{0x0a02, 0x01, 0x0000},
 	{0x0a00, 0x00, 0x000a},
@@ -295,11 +292,9 @@ struct msm_camera_i2c_reg_array hi556_readotp_init_regval_start[] = {
 	{0x003e, 0x10, 0x0000},
 	{0x070f, 0x05, 0x0000},
 	{0x0a00, 0x01, 0x0000},
-
 	{0x10a, 0x04, 0},//high
 	{0x10b, 0x01, 0},//low
 	{0x102, 0x01, 0},
-	//{0xf12, 0x1, 0},
 };
 struct msm_camera_i2c_reg_setting hi556_otp_read_init_setting_start = {
 	.reg_setting = hi556_readotp_init_regval_start,
@@ -308,7 +303,6 @@ struct msm_camera_i2c_reg_setting hi556_otp_read_init_setting_start = {
 	.data_type = MSM_CAMERA_I2C_BYTE_DATA,
 	.delay = 2,
 };
-
 struct msm_camera_i2c_reg_array hi556_readotp_init_regval_end[] = {
 	{0x0a00, 0x00, 0x000a},
 	{0x003f, 0x00, 0x0000},
@@ -321,9 +315,6 @@ struct msm_camera_i2c_reg_setting hi556_otp_read_init_setting_end = {
 	.data_type = MSM_CAMERA_I2C_BYTE_DATA,
 	.delay = 2,
 };
-//chengpeng@wind-mobi.com 20180128 end
-
-//zhenglihong@wind-mobi.com 20171012 begin 
 #if 1
 struct msm_camera_i2c_reg_array hi846_readotp_init_regval[] = {
 {0x2000, 0x100A,0x00},
@@ -536,7 +527,6 @@ struct msm_camera_i2c_reg_array hi846_readotp_init_regval[] = {
 {0x006A, 0x0100,0x00},
 {0x004C, 0x0100,0x00},
 };
-
 struct msm_camera_i2c_reg_setting hi846_otp_read_init_setting = {
 	.reg_setting = hi846_readotp_init_regval,
 	.size = ARRAY_SIZE(hi846_readotp_init_regval),
@@ -544,7 +534,6 @@ struct msm_camera_i2c_reg_setting hi846_otp_read_init_setting = {
 	.data_type = MSM_CAMERA_I2C_WORD_DATA,
 	.delay = 2,
 };
-
 struct msm_camera_i2c_reg_array hi846_readotp_init_regval_start[] = {
 	{0x0a02, 0x01, 0x0000},
 	{0x0a00, 0x00, 0x000a},
@@ -556,11 +545,9 @@ struct msm_camera_i2c_reg_array hi846_readotp_init_regval_start[] = {
 	{0x003e, 0x10, 0x0000},
 	{0x070f, 0x05, 0x0000},
 	{0x0a00, 0x01, 0x0000},
-
 	{0x70a, 0x2, 0},//high
 	{0x70b, 0x1, 0},//low
 	{0x702, 0x1, 0},
-	//{0xf12, 0x1, 0},
 };
 struct msm_camera_i2c_reg_setting hi846_otp_read_init_setting_start = {
 	.reg_setting = hi846_readotp_init_regval_start,
@@ -570,4 +557,3 @@ struct msm_camera_i2c_reg_setting hi846_otp_read_init_setting_start = {
 	.delay = 2,
 };
 #endif
-//zhenglihong@wind-mobi.com 20171012 end 

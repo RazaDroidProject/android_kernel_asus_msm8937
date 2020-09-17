@@ -32,9 +32,8 @@
 #define CYCLES_PER_MICRO_SEC_DEFAULT 4915
 #define CCI_MAX_DELAY 1000000
 
-//zhenglihong@wind-mobi.com 20171017 begin
-#define CCI_TIMEOUT msecs_to_jiffies(1500)
-//zhenglihong@wind-mobi.com 20171017 end
+#define CCI_TIMEOUT msecs_to_jiffies(500)
+
 /* TODO move this somewhere else */
 #define MSM_CCI_DRV_NAME "msm_cci"
 

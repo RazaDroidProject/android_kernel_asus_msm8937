@@ -55,7 +55,11 @@ static int msm_get_read_mem_size
 		}
 		for (i = 0; i < eeprom_map->memory_map_size; i++) {
 			if (eeprom_map->mem_settings[i].i2c_operation ==
-				MSM_CAM_READ) {
+				MSM_CAM_READ ||
+				(eeprom_map->mem_settings[i].i2c_operation ==  /*add for gc5005 by xujiawen@wind-mobi.com 20180725*/
+				MSM_CAM_READ_GC5005) ||
+				(eeprom_map->mem_settings[i].i2c_operation ==  /*add for gc8034 by xujiawen@wind-mobi.com 20180725*/
+				MSM_CAM_READ_LOOP)) {
 				size += eeprom_map->mem_settings[i].reg_data;
 			}
 		}
@@ -351,19 +355,15 @@ static int hynix_hi846_otp_readmode_initial(struct msm_eeprom_ctrl_t *e_ctrl, ui
 		CDBG("\r\n LK hi846 <3>""%s: otp read mode initial setting failed\n", __func__);
 		return rc;
 	}
-
 	for(i = 0; i< 0xABA; i++){//0xA8F
 		e_ctrl->i2c_client.i2c_func_tbl->i2c_read_seq(&(e_ctrl->i2c_client),
 			0x708, memptr, 1);
 		memptr++;
 		}
-
 	msleep(20);
-
 	pr_err("\r\n   hi846 %s read success\n", __func__);
 	return 0x846;
 }
-//chengpeng@wind-mobi.com 20180128 begin
 static int hynix_hi556_otp_readmode_initial(struct msm_eeprom_ctrl_t *e_ctrl, uint8_t *memptr)
 {
 	int rc = 0;
@@ -376,7 +376,6 @@ static int hynix_hi556_otp_readmode_initial(struct msm_eeprom_ctrl_t *e_ctrl, ui
 	} else if (e_ctrl->i2c_client.client) {
 			e_ctrl->i2c_client.client->addr = 0x20;
 	}
-
 	rc = e_ctrl->i2c_client.i2c_func_tbl->i2c_read(&(e_ctrl->i2c_client),
 			snsid_addr, &sensor_id, 2);
 	if (rc < 0) {
@@ -398,23 +397,18 @@ static int hynix_hi556_otp_readmode_initial(struct msm_eeprom_ctrl_t *e_ctrl, ui
 		CDBG("\r\n LK hi556 <3>""%s: otp read mode initial setting failed\n", __func__);
 		return rc;
 	}
-	
 	for(i = 0; i< 0x8f; i++){//0xA8F
 		e_ctrl->i2c_client.i2c_func_tbl->i2c_read_seq(&(e_ctrl->i2c_client),
 			0x0108, memptr, 1);
 		//pr_err("memptr[%d]:0x%x",i,*memptr);	
 		memptr++;
 	}
-	
 	rc = e_ctrl->i2c_client.i2c_func_tbl->i2c_write_table(&(e_ctrl->i2c_client), &hi556_otp_read_init_setting_end);
-	
 	if (rc < 0) {
 		CDBG("\r\n LK hi556 <3>""%s: otp read mode initial setting failed\n", __func__);
 		return rc;
 	}
-
 	msleep(20);
-
 	CDBG("\r\n   hi556 %s read success\n", __func__);
 	return 0x556;
 }
@@ -431,8 +425,9 @@ static int hynix_hi556_otp_readmode_initial(struct msm_eeprom_ctrl_t *e_ctrl, ui
 static int eeprom_parse_memory_map(struct msm_eeprom_ctrl_t *e_ctrl,
 	struct msm_eeprom_memory_map_array *eeprom_map_array)
 {
-	int rc =  0, i, j;
+	int rc =  0, i, j, gc;
 	uint8_t *memptr;
+	uint16_t gc_read = 0;
 	struct msm_eeprom_mem_map_t *eeprom_map;
 
 	e_ctrl->cal_data.mapdata = NULL;
@@ -528,6 +523,57 @@ static int eeprom_parse_memory_map(struct msm_eeprom_ctrl_t *e_ctrl,
 				memptr += eeprom_map->mem_settings[i].reg_data;
 			}
 			break;
+			case MSM_CAM_READ_GC5005: { /*add for gc5005*/
+				e_ctrl->i2c_client.addr_type = 1;
+				for(gc = 0; gc < eeprom_map->mem_settings[i].reg_data; gc++) {
+					e_ctrl->i2c_client.i2c_func_tbl->i2c_write(
+						&(e_ctrl->i2c_client), 0xd4,
+						0x80 | ((eeprom_map->mem_settings[i].reg_addr >> 8) & 0xff),
+						eeprom_map->mem_settings[i].data_type);
+					e_ctrl->i2c_client.i2c_func_tbl->i2c_write(
+ 						&(e_ctrl->i2c_client), 0xd5,
+ 						eeprom_map->mem_settings[i].reg_addr&0xff,
+						eeprom_map->mem_settings[i].data_type);
+					e_ctrl->i2c_client.i2c_func_tbl->i2c_write(
+ 						&(e_ctrl->i2c_client), 0xf3, 0x20,
+						eeprom_map->mem_settings[i].data_type);
+					msleep(eeprom_map->mem_settings[i].delay);
+					rc = e_ctrl->i2c_client.i2c_func_tbl->i2c_read(
+						&(e_ctrl->i2c_client), 0xd7, &gc_read,
+						eeprom_map->mem_settings[i].data_type);
+					eeprom_map->mem_settings[i].reg_addr++;
+					if (rc < 0) {
+						pr_err("%s: read failed\n",
+							__func__);
+						goto clean_up;
+					}
+					*memptr = (uint8_t)gc_read;
+					memptr++;
+				}
+			}
+			break;
+			//xujiawen@wind-mobi.com 20180725 start
+			case MSM_CAM_READ_LOOP: {
+ 				e_ctrl->i2c_client.addr_type =
+				 eeprom_map->mem_settings[i].addr_type;
+				for(gc = 0; gc < eeprom_map->mem_settings[i].reg_data; gc++) {
+					msleep(eeprom_map->mem_settings[i].delay);
+					rc = e_ctrl->i2c_client.i2c_func_tbl->i2c_read(
+						&(e_ctrl->i2c_client),
+						eeprom_map->mem_settings[i].reg_addr,
+						&gc_read,
+						eeprom_map->mem_settings[i].data_type);
+					if (rc < 0) {
+						pr_err("%s: read failed\n",
+							__func__);
+						goto clean_up;
+					}
+					*memptr = (uint8_t)gc_read;
+					memptr++;
+				}
+			}
+			break;
+			// add xujiawen@wind-mobi.com 20180725 end
 			default:
 				pr_err("%s: %d Invalid i2c operation LC:%d\n",
 					__func__, __LINE__, i);
@@ -731,10 +777,6 @@ static int eeprom_config_read_cal_data(struct msm_eeprom_ctrl_t *e_ctrl,
 		return -EINVAL;
 	}
 
-       CDBG("%s:exp %u, req %u\n", __func__,
-			e_ctrl->cal_data.num_data,
-			cdata->cfg.read_data.num_bytes);
-	   
 	rc = copy_to_user(cdata->cfg.read_data.dbuffer,
 		e_ctrl->cal_data.mapdata,
 		cdata->cfg.read_data.num_bytes);
@@ -772,7 +814,7 @@ static int msm_eeprom_config(struct msm_eeprom_ctrl_t *e_ctrl,
 			e_ctrl->eboard_info->eeprom_name, length);
 		break;
 	case CFG_EEPROM_GET_CAL_DATA:
-		CDBG("%s E CFG_EEPROM_GET_CAL_DATA %d\n", __func__,e_ctrl->cal_data.num_data);
+		CDBG("%s E CFG_EEPROM_GET_CAL_DATA\n", __func__);
 		cdata->cfg.get_data.num_bytes =
 			e_ctrl->cal_data.num_data;
 		break;
@@ -1482,9 +1524,6 @@ static int eeprom_config_read_cal_data32(struct msm_eeprom_ctrl_t *e_ctrl,
 	rc = copy_to_user(ptr_dest, e_ctrl->cal_data.mapdata,
 		cdata.cfg.read_data.num_bytes);
 
-         CDBG("%s: size. exp %u, req %u\n", __func__,
-			e_ctrl->cal_data.num_data,
-			cdata.cfg.read_data.num_bytes);
 	return rc;
 }
 
@@ -1640,7 +1679,7 @@ static int msm_eeprom_config32(struct msm_eeprom_ctrl_t *e_ctrl,
 			e_ctrl->eboard_info->eeprom_name, length);
 		break;
 	case CFG_EEPROM_GET_CAL_DATA:
-		CDBG("%s E CFG_EEPROM_GET_CAL_DATA %d\n", __func__,e_ctrl->cal_data.num_data);
+		CDBG("%s E CFG_EEPROM_GET_CAL_DATA\n", __func__);
 		cdata->cfg.get_data.num_bytes =
 			e_ctrl->cal_data.num_data;
 		break;
@@ -1816,7 +1855,7 @@ static int msm_eeprom_platform_probe(struct platform_device *pdev)
 		rc = of_property_read_u32(of_node, "qcom,slave-addr",
 			&temp);
 		if (rc < 0) {
-			pr_err("%s slave-addr failed rc %d\n", __func__, rc);
+			pr_err("%s failed rc %d\n", __func__, rc);
 			goto board_free;
 		}
 
